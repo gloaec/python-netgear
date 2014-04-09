@@ -6,8 +6,8 @@ import cookielib
 import Cookie
 import StringIO
 from urlparse import urljoin
-from poster.encode import multipart_encode
-from poster.streaminghttp import register_openers
+from .poster.encode import multipart_encode
+from .poster.streaminghttp import register_openers
 
 class Api(object):
 
