@@ -7,7 +7,7 @@ import Cookie
 import StringIO
 from urlparse import urljoin
 from .poster.encode import multipart_encode
-from .poster.streaminghttp import register_openers
+from .poster.streaminghttp import get_handlers
 
 class Api(object):
 
@@ -21,9 +21,11 @@ class Api(object):
         self._app_host     = app_host
         self._debug        = debug
         self._cookies      = cookielib.CookieJar()
-        self._opener       = urllib2.build_opener(urllib2.HTTPCookieProcessor(self._cookies))
+        handlers           = get_handlers()
+        handlers.append(urllib2.HTTPCookieProcessor(self._cookies))
+        self._opener       = urllib2.build_opener(*handlers)
 
-    def sendRequest(self, path, params=None, headers=None):
+    def sendRequest(self, path, params=None):
         """ Send the request to the API server
             also encrypts the request, then checks
             if the results are valid """
@@ -33,7 +35,7 @@ class Api(object):
         self._cookies.add_cookie_header(request)
         if self._debug: print "Querying '%s'..." % url
         if params:
-            return self._opener.open(request, urllib.urlencode(params), headers).read()
+            return self._opener.open(request, urllib.urlencode(params)).read()
         else:
             return self._opener.open(request).read()
  
@@ -52,7 +54,7 @@ class Api(object):
         """ Send configuration to the switch """
         if not self.login(): raise Exception('Login Failed')
         elif self._debug: print 'Successfully logged in'
-        register_openers()
+        #register_openers()
         datagen, headers = multipart_encode({
             'v_1_10_2'          : 'Text Configuration',
             '.v_1_3_1_handle'   : open(configfile, 'rb'),
@@ -72,8 +74,10 @@ class Api(object):
             'clazz_information' : 'http_file_download.html',
             'v_1_5_1'           : 'APPLY'
         })
-        res = self.sendRequest('/http_file_download.html/a1', datagen, headers)
-        return ('File transfer operation completed' in res)
+        url     = urljoin(self._app_host, '/http_file_download.html/a1')
+        request = urllib2.Request(url, datagen, headers)
+        result  = self._opener.open(request).read()
+        return ('transfer success' in result)
 
 def encrypt(key, plaintext):
     padded_key = key.ljust(KEY_SIZE, '\0')

@@ -30,7 +30,7 @@ import httplib, urllib2, socket
 from httplib import NotConnected
 
 __all__ = ['StreamingHTTPConnection', 'StreamingHTTPRedirectHandler',
-        'StreamingHTTPHandler', 'register_openers']
+        'StreamingHTTPHandler', 'register_openers', 'get_handlers']
 
 if hasattr(httplib, 'HTTPS'):
     __all__.extend(['StreamingHTTPSHandler', 'StreamingHTTPSConnection'])

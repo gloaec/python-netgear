@@ -35,7 +35,7 @@ def main(argv):
               debug        = args.debug)
 
     #try:
-    if api.uploadConfig(config=args.configfile):
+    if api.uploadConfig(args.configfile):
        print 'Configuration successfully transferred'
     else: raise Exception('Cannot upload configuration')
     #except Exception, e:
