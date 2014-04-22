@@ -1,5 +1,6 @@
 # Ignore config dump
 switch.config
+netgear.conf
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
